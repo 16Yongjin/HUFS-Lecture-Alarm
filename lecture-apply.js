@@ -104,7 +104,6 @@ let myClass = [
 let sentLecture = {};
 
 const lectureCheck = (majors, callback) => {
-    // var major = 'ALAA1_H1';
 
     let lectureInfos = [];
 
@@ -149,22 +148,18 @@ const lectureCheck = (majors, callback) => {
                 obj.course_number = s[3];
                 obj.subject = s[4];
                 obj.professor = s[6];
-
-                let offset = 0;
-                if (s[7].length <= 1) {
-                    // 외국인 교수라 한국 이름이 없을 때
-                    offset = -1;
+                if (s[6][0] === '(' || s[6].length <= 1) {
+                    obj.professor = s[5];
                 }
 
-                if (s[8].length > 1) {
-                    // 영어 이름이 두줄을 차지할 때
-                    offset = 1;
-                }
+                obj.note = s[s.length - 1].includes('/') ? '' : s[s.length - 1]; // 비고사항
 
-                obj.time = s[10 + offset];
-                obj.people = s[13 + offset];
+                const timeIndex = obj.note === '' ? 4 : 5
 
-                if (obj.people && obj.people.includes('/')) {
+                obj.time = s[s.length - timeIndex];
+                obj.people = s.filter(k => k.includes(' / '))[0]
+
+                if (obj.people) {
                     obj.isEmpty =
                         Number(obj.people.replace(/(\d+).\/.(\d+)/g, '$1')) /
                             Number(
@@ -173,7 +168,7 @@ const lectureCheck = (majors, callback) => {
                         1;
                 }
 
-                obj.note = s[s.length - 1].includes('/') ? '' : s[s.length - 1]; // 비고사항
+                
                 lecture.push(obj);
                 obj = {};
             });
@@ -181,6 +176,8 @@ const lectureCheck = (majors, callback) => {
             lectureInfos = lectureInfos.concat(lecture);
 
             completed_requests++;
+
+
             if (completed_requests === majors.length) {
                 callback(lectureInfos);
             }
@@ -188,7 +185,94 @@ const lectureCheck = (majors, callback) => {
     });
 };
 
-const sendMessage = (title, text) => {
+
+const cachedLectureCheck = (majors, course_numbers, callback) => {
+    let lectureInfos = [];
+
+    let completed_requests = 0;
+
+    majors.forEach(major => {
+        let url = `http://wis.hufs.ac.kr:8989/src08/jsp/lecture/LECTURE2020L.jsp?tab_lang=K&type=&ag_ledg_year=2017&ag_ledg_sessn=3&ag_org_sect=A&campus_sect=H1`;
+
+        url +=
+            major[0] === 'A'
+                ? `&ag_crs_strct_cd=${major}&gubun=1`
+                : `&ag_compt_fld_cd=${major}&gubun=2`;
+
+        client.fetch(url, {}, function(err, $, res) {
+            if (err) {
+                console.log('Error : ', err);
+                return;
+            }
+
+            let fetchHtml = $('div')
+                .children('div')
+                .children('table')
+                .children('tbody')
+                .html();
+            fetchHtml = fetchHtml.match(/<tr>(.|[\r\n])+?<\/tr>/g);
+            fetchHtml = fetchHtml.map(i =>
+                i.replace(/\s{2,}/g, '\n').replace(/(<([^>]+)>)/gi, '')
+            );
+
+            fetchHtml.splice(0, 1);
+
+            let lecture = [];
+
+            fetchHtml.forEach(i => {
+
+                let s = i.split('\n');
+                s = s.filter(i => i !== '');
+                if (!course_numbers.includes(s[3])) {
+                    return;
+                }
+                console.log(s);
+                let obj = {};
+                obj.num = s[0];
+                obj.area = s[1];
+                obj.year = s[2];
+                obj.course_number = s[3];
+                obj.subject = s[4];
+                obj.professor = s[6];
+                if (s[6][0] === '(' || s[6].length <= 1) {
+                    obj.professor = s[5];
+                }
+
+                obj.note = s[s.length - 1].includes('/') ? '' : s[s.length - 1]; // 비고사항
+
+                const timeIndex = obj.note === '' ? 4 : 5
+
+                obj.time = s[s.length - timeIndex];
+                obj.people = s.filter(k => k.includes(' / '))[0]
+
+                if (obj.people) {
+                    obj.isEmpty =
+                        Number(obj.people.replace(/(\d+).\/.(\d+)/g, '$1')) /
+                            Number(
+                                obj.people.replace(/(\d+).\/.(\d+)/g, '$2')
+                            ) <
+                        1;
+                }
+
+                
+                lecture.push(obj);
+                obj = {};
+            });
+
+            lectureInfos = lectureInfos.concat(lecture);
+
+            completed_requests++;
+
+
+            if (completed_requests === majors.length) {
+                callback(lectureInfos);
+            }
+        });
+    });
+};
+
+
+const sendMessageToMe = (title, text) => {
     let url = 'https://fcm.googleapis.com/fcm/send';
 
     // Set the headers
@@ -225,36 +309,116 @@ const sendMessage = (title, text) => {
     });
 };
 
-const getLectureAndSendNoti = () => {
+
+const sendMessage = (token, title, text) => {
+    let url = 'https://fcm.googleapis.com/fcm/send';
+
+    // Set the headers
+    const headers = {
+        Authorization:
+            'key=AAAAF0fPUwk:APA91bGP8nfVgRPNlDMAlWp49b2OyJch2sVfIWYGdbTQ0QFDVmoOpzLuXRvAT9DuhMGxFcmgmcu2qQQEUUNSCpwWWV8GV_AsDTD8iABjWSz1kZ1mJRsS9iwODl7TR3j1ddIejTaQ8D_v',
+        'Content-Type': 'application/json'
+    };
+
+    const body = {
+        notification: {
+            title,
+            text,
+            sound: 'noti',
+            color: '#2C5398'
+        },
+        to: token
+    };
+
+    // Configure the request
+    const options = {
+        url: url,
+        method: 'POST',
+        headers,
+        json: body
+    };
+
+    // Start the request
+    request(options, function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+            return;
+        }
+    });
+};
+
+
+const getLectureAndSendNotitoMe = () => {
     lectureCheck(myLecture, i => {
         let res = i.filter(j => myClass.includes(j.course_number));
         // console.log(res);
         res.map(j => {
             if (!sentLecture[j.course_number] && j.isEmpty) {
-                sendMessage(`${j.subject}`, `${j.professor} 교수님, 빈 자리 생겼어요`);
+                sendMessageToMe(`${j.subject}`, `${j.professor} 교수님, 빈 자리 생겼어요`);
                 sentLecture[j.course_number] = true;
             }
 
             if (sentLecture[j.course_number] && !j.isEmpty) {
                 sentLecture[j.course_number] = false;
-                sendMessage(`${j.subject}`, `${j.professor} 교수님, 꽉 찼네요`);
+                sendMessageToMe(`${j.subject}`, `${j.professor} 교수님, 꽉 찼네요`);
             }
         });
     });
 };
 
 
+const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
+
+    // console.log('majors :', majors, 'lectures:', lectures, 'tokens:', tokens, 'users:', users);
+    cachedLectureCheck(majors, lectures, res => {
+        res.map(i => {
+            console.log('found lecture: ', i);
+            console.log(sentLecture);
+            if (!sentLecture[i.course_number] && i.isEmpty) {
+                tokens.forEach(token => {
+                    users[token].course_numbers.map(k => {
+                        if (k === i.course_number) {
+                            sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 빈 자리 생겼어요` );
+                        }
+                    });
+
+                });
+                sentLecture[i.course_number] = true;
+                
+            }
+
+            if (sentLecture[i.course_number] && !i.isEmpty) {
+                tokens.forEach(token => {
+                    users[token].course_numbers.map(k => {
+                        if (k === i.course_number) {
+                            sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 자리 다 찼네요` );
+                        }
+                    });
+                });
+                sentLecture[i.course_number] = false;
+            }
+        })
+    }) 
+}
+
+
+module.exports = {lectureCheck, getCachedLectureAndSendNoti}
+
+
+// lectureCheck(myLecture, i => {
+//     console.log(i);
+// })
+
 
 var o = moment.add(9, 'hours').format('H');
 
-if (10 <= o && 0 <= 16) {
+// if (10 <= o && 0 <= 16) {
 
-        setInterval(getLectureAndSendNoti, 3000);
+//         setInterval(getLectureAndSendNoti, 3000);
     
-} else {
-    setInterval(() => {
-        console.log('Hello')
-        if (10 <= o && 0 <= 16)
-            return 
-    }, 1000)
-}
+// } else {
+//     setInterval(() => {
+
+//         if (10 <= o && 0 <= 16)
+//             return 
+//     }, 10000)
+// }
