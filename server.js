@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const {lectureCheck, getCachedLectureAndSendNoti} = require('./lecture-apply');
 const {Users} = require('./users');
+const path = require('path');
 
 const port = process.env.PORT || 3005;
 
@@ -10,6 +11,8 @@ let users = new Users();
 
 var app = express();
 app.use(bodyParser.json());
+
+app.use('/', express.static(path.join(__dirname, 'public')))
 
 app.get('/lectures', (req, res) => {
     lectureCheck([req.query.id], result => {

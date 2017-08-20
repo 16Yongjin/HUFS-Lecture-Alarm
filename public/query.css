@@ -1,0 +1,49 @@
+
+/* Big tablet to 1200px (which smaller than the 1140px row) */
+@media only screen and (max-width: 1200px) {
+
+}
+
+
+/* Small tablet to Big tablet: from 768 to 1023px */
+@media only screen and (max-width: 1023px) {
+
+}
+
+
+/* Small phones to Small tablets: from 481 to 767px */
+@media only screen and (max-width: 767px) {
+
+    .modal-container {
+  width: 80vw;
+  padding: 20px 20px;
+
+}
+    
+    .modal-body label {
+    font-size: 1.6rem;
+}
+    
+    
+
+
+    
+}
+
+
+/* Small phones: from 0 to 480px */
+@media only screen and (max-width: 480px) {
+        .modal-container {
+  width: 95vw;
+  padding: 20px 3px;
+
+}
+        .modal-body label {
+    font-size: 1.4rem;
+}
+}
+
+
+
+
+
