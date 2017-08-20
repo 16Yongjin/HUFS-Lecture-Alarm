@@ -22,7 +22,8 @@ app.post('/register', (req, res) => {
         token: req.body.token,
         major: req.body.major,
         course_number: req.body.course_number,
-        lecture_info: req.body.lecture_info.trim()
+        lecture_info: req.body.lecture_info.trim(),
+        lecture_subject: req.body.lecture_subject.trim()
     })
 
     // console.log(users.users);

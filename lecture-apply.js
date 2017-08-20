@@ -140,7 +140,7 @@ const lectureCheck = (majors, callback) => {
             fetchHtml.forEach(i => {
                 let s = i.split('\n');
                 s = s.filter(i => i !== '');
-                // console.log(s);
+                //console.log(s);
                 let obj = {};
                 obj.num = s[0];
                 obj.area = s[1];
@@ -154,9 +154,12 @@ const lectureCheck = (majors, callback) => {
 
                 obj.note = s[s.length - 1].includes('/') ? '' : s[s.length - 1]; // 비고사항
 
-                const timeIndex = obj.note === '' ? 4 : 5
+                const timeIndex = obj.note === '' ? 2 : 3
 
                 obj.time = s[s.length - timeIndex];
+                if (obj.time.includes(')')) {
+                    obj.time =  obj.time.slice(0, obj.time.indexOf(')') + 1);
+                }
                 obj.people = s.filter(k => k.includes(' / '))[0]
 
                 if (obj.people) {
@@ -226,7 +229,7 @@ const cachedLectureCheck = (majors, course_numbers, callback) => {
                 if (!course_numbers.includes(s[3])) {
                     return;
                 }
-                console.log(s);
+                //console.log(s);
                 let obj = {};
                 obj.num = s[0];
                 obj.area = s[1];
@@ -240,9 +243,13 @@ const cachedLectureCheck = (majors, course_numbers, callback) => {
 
                 obj.note = s[s.length - 1].includes('/') ? '' : s[s.length - 1]; // 비고사항
 
-                const timeIndex = obj.note === '' ? 4 : 5
+                const timeIndex = obj.note === '' ? 2 : 3
 
                 obj.time = s[s.length - timeIndex];
+                if (obj.time.includes(')')) {
+                    obj.time =  obj.time.slice(0, obj.time.indexOf(')') + 1);
+                }
+
                 obj.people = s.filter(k => k.includes(' / '))[0]
 
                 if (obj.people) {
@@ -287,7 +294,8 @@ const sendMessageToMe = (title, text) => {
             title,
             text,
             sound: 'noti',
-            color: '#2C5398'
+            color: '#2C5398',
+            icon: 'firebase-logo.png'
         },
         to:
             'dsotDofsOPM:APA91bG5HVPNKObqeyRbTMwbJ-OgOobxPyCsEGoFWGtl1slL5cw67t1z9DopWHlQsau4wVPhPPMkKK5Eo9YD26pY5szAqubk31M0nTXjrLdm3oW0-XIKW9-gbsnjWL_u8lBmZCoV_NRW'
@@ -325,7 +333,8 @@ const sendMessage = (token, title, text) => {
             title,
             text,
             sound: 'noti',
-            color: '#2C5398'
+            color: '#2C5398',
+            icon: 'firebase-logo.png'            
         },
         to: token
     };
@@ -371,30 +380,46 @@ const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
     // console.log('majors :', majors, 'lectures:', lectures, 'tokens:', tokens, 'users:', users);
     cachedLectureCheck(majors, lectures, res => {
         res.map(i => {
-            console.log('found lecture: ', i);
-            console.log(sentLecture);
-            if (!sentLecture[i.course_number] && i.isEmpty) {
+            // console.log('found lecture: ', i);
+
+            if (i.isEmpty) {
                 tokens.forEach(token => {
                     users[token].course_numbers.map(k => {
+
+
                         if (k === i.course_number) {
-                            sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 빈 자리 생겼어요` );
+                            users[token].lecture_infos.filter(lectureInfo => lectureInfo.course_number === k)[0].people = i.people;
+
+                            if (!users[token].sentLecture[k]) {
+                                console.log(i.subject, i.people);
+                                users[token].sentLecture[k] = true;
+                                sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 빈 자리 생겼어요` );
+
+                            }
+                            
                         }
                     });
 
                 });
-                sentLecture[i.course_number] = true;
+
                 
-            }
-
-            if (sentLecture[i.course_number] && !i.isEmpty) {
+            } else {
                 tokens.forEach(token => {
                     users[token].course_numbers.map(k => {
+
                         if (k === i.course_number) {
-                            sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 자리 다 찼네요` );
-                        }
+                            users[token].lecture_infos.filter(lectureInfo => lectureInfo.course_number === k)[0].people = i.people;
+                        
+                            if (users[token].sentLecture[k]) {
+                                console.log(i.subject, i.people);
+                                users[token].sentLecture[k] = false;                          
+                                sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 자리 다 찼네요` );
+                            }
+                    }
+                    
                     });
                 });
-                sentLecture[i.course_number] = false;
+
             }
         })
     }) 
@@ -409,7 +434,7 @@ module.exports = {lectureCheck, getCachedLectureAndSendNoti}
 // })
 
 
-var o = moment.add(9, 'hours').format('H');
+
 
 // if (10 <= o && 0 <= 16) {
 

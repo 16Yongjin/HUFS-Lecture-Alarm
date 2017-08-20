@@ -28,7 +28,8 @@ class Users {
 
             u['lecture_infos'].push({
                 course_number,
-                lecture_info: user.lecture_info
+                lecture_subject: user.lecture_subject,
+                lecture_info: user.lecture_info,
             })
             
             return;
@@ -38,7 +39,10 @@ class Users {
         this.users[user.token] = { 
             course_numbers: [course_number],
             lecture_infos: [{course_number,
-                lecture_info: user.lecture_info}]
+                lecture_subject: user.lecture_subject,
+                lecture_info: user.lecture_info
+            }],
+            sentLecture: {}
         }
 
     }
@@ -49,6 +53,7 @@ class Users {
         if (target) {
             target.course_numbers = target.course_numbers.filter(j => j !== course_number);
             target.lecture_infos = target.lecture_infos.filter(j => j.course_number !== course_number);
+            target.sentLecture[course_number] = false;
         }
     }
 
