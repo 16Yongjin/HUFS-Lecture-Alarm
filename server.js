@@ -51,10 +51,18 @@ app.post('/remove', (req, res) => {
     
     res.send(users.getUser(req.body.token));
     // console.log(users.getUser(req.body.token));
+});
+
+app.get('/usersStatus', (req, res) => {
+    if (req.query.admin === '11111') {
+        res.send(users);
+    } else {
+        res.send('Not permitted!');
+    }
 })
 
 app.listen(port, () => {
     console.log(`Server is up on port ${port}`);
 });
 
-setInterval(getCachedLectureAndSendNoti.bind(null, users.majors, users.course_numbers_cache, users.tokens, users.users), 3000);
+setInterval(getCachedLectureAndSendNoti.bind(null, users.majors, users.lectures, users.tokens, users.users), 3000);

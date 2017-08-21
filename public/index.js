@@ -16,7 +16,7 @@ messaging.requestPermission()
     return messaging.getToken();
 })
 .then(function(token) {
-    console.log(token);
+    // console.log(token);
     app.token = token;
 
 })
@@ -31,7 +31,7 @@ messaging.onMessage(function(payload) {
     alert(payload.notification.title + ' ' + payload.notification.body);
 });
 
-const serverURL = 'https://hufs-lecture-alert.yjdev.com';
+const serverURL = 'http://localhost:3005';
 
 
 
@@ -58,13 +58,15 @@ var app = new Vue({
         },
         register: function () {
             if (!this.selected.length) {
-                alert('전공/교양을 선택해주세요.');
-                return;
+                return ('전공/교양을 선택해주세요.');
             }
             
             if (!this.selectedLecture){
-                alert('강의를 선택해주세요.');
-                return;
+                return alert('강의를 선택해주세요.');
+            }
+
+            if (this.registeredLectures.length > 4) {
+                return alert('알람은 5개까지 등록 가능합니다.');
             }
 
             const body = {
@@ -100,6 +102,7 @@ var app = new Vue({
         },
         deleteLecture: function(course) {
             console.log(course);
+            console.log('Hello');
             
             const body = {
                 token: this.token,

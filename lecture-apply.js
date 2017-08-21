@@ -378,7 +378,7 @@ const getLectureAndSendNotitoMe = () => {
 const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
 
     // console.log('majors :', majors, 'lectures:', lectures, 'tokens:', tokens, 'users:', users);
-    cachedLectureCheck(majors, lectures, res => {
+    cachedLectureCheck(majors.cache, lectures.cache, res => {
         res.map(i => {
             // console.log('found lecture: ', i);
 
