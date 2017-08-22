@@ -36,10 +36,10 @@
     <div id="app" class="container">
 
 
-        <div>
-        <button class="btn btn-default btn-lg" id="show-modal" @click="showModal = true">강의 등록하기</button>
+        <div style="margin-top:  15px;">
+                <button class="btn btn-default btn-lg" id="show-modal" @click="showModal = true">강의 등록하기</button>
         
-                <button class="btn btn-default btn-lg" v-on:click="loadUser">
+                <button class="btn btn-default btn-lg" style="margin-left: 15px;" v-on:click="loadUser">
                         <span class="glyphicon glyphicon-refresh"></span> Refresh
                 </button>
         </div>
@@ -477,7 +477,7 @@
                 <tr v-for="registeredLecture in registeredLectures">
                     <td data-title="강의명" class="registered">{{ registeredLecture.lecture_subject }}</td>
                     <td data-title="정보" class="registered">{{ registeredLecture.lecture_info }}</td>
-                    <td data-title="인원" class="registered">{{ registeredLecture.people }}</td>
+                    <td data-title="인원" class="registered">{{ registeredLecture.people? registeredLecture.people: ' / ' }}</td>
                     <td data-title="알람 끄기" class="registered"><button class="btn btn-default btn-lg" v-on:click="deleteLecture(registeredLecture.course_number)">삭제</button></td>
                 </tr>
             </tbody>

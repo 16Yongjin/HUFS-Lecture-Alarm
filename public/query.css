@@ -26,7 +26,10 @@
 		left: -9999px;
 	}
  
-	#no-more-tables tr { border: 1px solid #ccc; }
+	#no-more-tables tr { 
+		border: 1px solid #ccc;
+		margin-bottom: 5px;
+	}
  
 	#no-more-tables td { 
 		/* Behave  like a "row" */
