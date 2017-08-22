@@ -461,25 +461,34 @@
 
         
         
+        <div id="no-more-tables">
+            
+        
         <table class="table table-hover" v-show="registeredLectures.length > 0"> 
             <thead>
                 <tr>
-                    <th>강의명</th>
-                    <th>당담교수/강의시간/강의실</th>
-                    <th>인원</th>
-                    <th>알람 끄기</th>
+                    <th class="registered">강의명</th>
+                    <th class="registered">당담교수/강의시간/강의실</th>
+                    <th class="registered">인원</th>
+                    <th class="registered">알람 끄기</th>
                 </tr>
             </thead>
             <tbody style="font-size:1.7rem;">
                 <tr v-for="registeredLecture in registeredLectures">
-                    <th>{{ registeredLecture.lecture_subject }}</th>
-                    <th>{{ registeredLecture.lecture_info }}</th>
-                    <th>{{ registeredLecture.people }}</th>
-                    <th><button class="btn btn-default btn-lg" v-on:click="deleteLecture(registeredLecture.course_number)">삭제</button></th>
-                    
+                    <td data-title="강의명" class="registered">{{ registeredLecture.lecture_subject }}</td>
+                    <td data-title="정보" class="registered">{{ registeredLecture.lecture_info }}</td>
+                    <td data-title="인원" class="registered">{{ registeredLecture.people }}</td>
+                    <td data-title="알람 끄기" class="registered"><button class="btn btn-default btn-lg" v-on:click="deleteLecture(registeredLecture.course_number)">삭제</button></td>
                 </tr>
             </tbody>
         </table>
+    </div>
+
+
+    
+                        
+
+
 
 
         <!-- <ul class="list-group">

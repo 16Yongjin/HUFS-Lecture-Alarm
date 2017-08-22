@@ -77,10 +77,6 @@ class Users {
             }
 
             target.course_numbers = target.course_numbers.filter(j => j !== course_number);
-
-            console.log('shosho');
-            console.log(target.lecture_infos);
-
             target.lecture_infos = target.lecture_infos.filter(j => j.course_number !== course_number);
             target.sentLecture[course_number] = false;
         }
