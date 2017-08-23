@@ -9,7 +9,7 @@ var config = {
 firebase.initializeApp(config);
 
 
-var messaging = firebase.messaging();
+const messaging = firebase.messaging();
 messaging.requestPermission()
 .then(function() {
     console.log('Have permission');
@@ -31,7 +31,7 @@ messaging.onMessage(function(payload) {
     alert(payload.notification.title + ' ' + payload.notification.body);
 });
 
-var serverURL = 'http://localhost:3005';
+const serverURL = 'http://localhost:3005';
 
 
 
@@ -73,7 +73,7 @@ var app = new Vue({
                 return alert('알람은 5개까지 등록 가능합니다.');
             }
 
-            var body = {
+            const body = {
                 token: this.token,
                 major: this.selected,
                 course_number: this.selectedLecture,
@@ -81,7 +81,7 @@ var app = new Vue({
                 lecture_subject: this.lecture_subject
             }
 
-            var headers = {
+            const headers = {
                 'Content-Type': 'application/json'
             }
 
@@ -108,12 +108,12 @@ var app = new Vue({
             console.log(course);
             console.log('Hello');
             
-            var body = {
+            const body = {
                 token: this.token,
                 course_number: course
             }
             
-            var headers = {
+            const headers = {
                 'Content-Type': 'application/json'
             }
 
