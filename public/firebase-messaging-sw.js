@@ -11,12 +11,12 @@ var config = {
 };
 firebase.initializeApp(config);
 
-const messaging = firebase.messaging();
+var messaging = firebase.messaging();
 messaging.setBackgroundMessageHandler(function(payload) {
 
-    const title = 'Hello world!123';
-    const options = {
-        body: payload.data.status
-    };
+    var title = 'Hello world!123';
+    var options = {
+        body: payload.data.status,
+    };  
     return self.registration.showNotification(title, options);
 })

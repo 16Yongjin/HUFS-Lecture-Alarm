@@ -478,7 +478,7 @@
                     <td data-title="강의명" class="registered">{{ registeredLecture.lecture_subject }}</td>
                     <td data-title="정보" class="registered">{{ registeredLecture.lecture_info }}</td>
                     <td data-title="인원" class="registered">{{ registeredLecture.people? registeredLecture.people: ' / ' }}</td>
-                    <td data-title="알람 끄기" class="registered"><button class="btn btn-default btn-lg" v-on:click="deleteLecture(registeredLecture.course_number)">삭제</button></td>
+                    <td data-title="알람 끄기" class="registered"><button class="btn btn-default btn-lg" @click="deleteLecture(registeredLecture.course_number)">삭제</button></td>
                 </tr>
             </tbody>
         </table>
@@ -512,9 +512,7 @@
 
         <script src="https://unpkg.com/vue"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.4"></script>
-
-
-        <script src="./app.js"></script>
+        <audio id="notiSound" src="./iphone.mp3" preload="auto"></audio>
         <script src="./index.js"></script>
 
 

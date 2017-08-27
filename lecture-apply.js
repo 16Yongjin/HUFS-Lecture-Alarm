@@ -1,6 +1,5 @@
 const request = require('request');
 const client = require('cheerio-httpcli');
-
 const moment = require('moment')();
 
 const mm = [
@@ -295,7 +294,7 @@ const sendMessageToMe = (title, text) => {
             text,
             sound: 'noti',
             color: '#2C5398',
-            icon: 'firebase-logo.png'
+            icon: 'firebase-logo'
         },
         to:
             'dsotDofsOPM:APA91bG5HVPNKObqeyRbTMwbJ-OgOobxPyCsEGoFWGtl1slL5cw67t1z9DopWHlQsau4wVPhPPMkKK5Eo9YD26pY5szAqubk31M0nTXjrLdm3oW0-XIKW9-gbsnjWL_u8lBmZCoV_NRW'
@@ -332,9 +331,10 @@ const sendMessage = (token, title, text) => {
         notification: {
             title,
             text,
-            sound: 'noti',
+            sound: 'notiSound.mp3',
             color: '#2C5398',
-            icon: 'firebase-logo.png'            
+            icon: 'firebase-logo.png',
+            "click_action" : "http://hufs.ac.kr/"            
         },
         to: token
     };
@@ -377,16 +377,18 @@ const getLectureAndSendNotitoMe = () => {
 
 const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
 
+    const hour = moment.format('H');
+    if (!(10 <= hour && hour <= 16)){
+        return;
+    }
+    
     // console.log('majors :', majors, 'lectures:', lectures, 'tokens:', tokens, 'users:', users);
     cachedLectureCheck(majors.cache, lectures.cache, res => {
         res.map(i => {
             // console.log('found lecture: ', i);
-
             if (i.isEmpty) {
                 tokens.forEach(token => {
                     users[token].course_numbers.map(k => {
-
-
                         if (k === i.course_number) {
                             users[token].lecture_infos.filter(lectureInfo => lectureInfo.course_number === k)[0].people = i.people;
 
@@ -394,19 +396,13 @@ const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
                                 console.log(i.subject, i.people);
                                 users[token].sentLecture[k] = true;
                                 sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 빈 자리 생겼어요` );
-
-                            }
-                            
+                            }    
                         }
                     });
-
                 });
-
-                
             } else {
                 tokens.forEach(token => {
                     users[token].course_numbers.map(k => {
-
                         if (k === i.course_number) {
                             users[token].lecture_infos.filter(lectureInfo => lectureInfo.course_number === k)[0].people = i.people;
                         
@@ -420,9 +416,8 @@ const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
                     });
                 });
 
-            }
-        })
-    }) 
+            }});
+    }); 
 }
 
 

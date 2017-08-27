@@ -1,9 +1,10 @@
 var moment = require('moment')();
 
-var o = moment.add(15, 'hours').format('H');
+var hour = moment.format('H');
 
-if (10 <= o && 0 <= 16){
+console.log(hour)
+if (10 <= hour && hour <= 16){
     console.log('Hello')
-    console.log(o)
+    console.log(hour)
 }
 

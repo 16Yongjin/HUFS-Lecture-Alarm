@@ -28,6 +28,7 @@ messaging.requestPermission()
 
 messaging.onMessage(function(payload) {
     console.log('onMessage: ', payload);
+    document.getElementById('notiSound').play();
     alert(payload.notification.title + ' ' + payload.notification.body);
 });
 
@@ -85,9 +86,9 @@ var app = new Vue({
                 'Content-Type': 'application/json'
             }
 
-            this.$http.post(serverURL + '/register', body, headers).then(response => {
+            this.$http.post(serverURL + '/register', body, headers).then(function (response) {
                 this.registeredLectures = response.body;
-                console.log(response.body);
+                // console.log(response.body);
                 this.showModal = false;
                 this.selectedLecture = '';
                 this.lecture_info = '';
@@ -105,8 +106,8 @@ var app = new Vue({
             this.selectedLecture = '';
         },
         deleteLecture: function(course) {
-            console.log(course);
-            console.log('Hello');
+            // console.log(course);
+            // console.log('Hello');
             
             var body = {
                 token: this.token,
@@ -118,27 +119,24 @@ var app = new Vue({
             }
 
             
-            this.$http.post( serverURL + '/remove', body, headers).then(response => {
+            this.$http.post( serverURL + '/remove', body, headers).then( function (response) {
                 this.registeredLectures = response.body;
-                console.log(response.body);
+                // console.log(response.body);
             });
-        },
-        hello: function() {
-            console.log('Hello');
         },
         loadUser: function() {
             if (this.token === '')
                 return;
 
-            this.$http.get(serverURL + '/user?token=' + this.token).then(response => {
-                console.log(response.bodyText);
+            this.$http.get(serverURL + '/user?token=' + this.token).then( function (response) {
+                // console.log(response.bodyText);
                 
                 if (!response.bodyText)
                     return;
                 // get body data
                 this.registeredLectures = JSON.parse(response.bodyText);
 
-            }, response => {
+            }, function (response) {
                 // error callback
                 console.log('Error!!')
             });
@@ -146,13 +144,13 @@ var app = new Vue({
     },
     watch: {
         selected: function () {
-                this.$http.get(serverURL + '/lectures?id=' + this.selected ).then(response => {    
+                this.$http.get(serverURL + '/lectures?id=' + this.selected ).then(function(response) {    
                 // get body data
                 this.lectures = JSON.parse(response.bodyText);
                 
 
 
-            }, response => {
+            }, function(response) {
                 // error callback
                 console.log('Error!!')
             });
