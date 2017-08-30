@@ -378,6 +378,7 @@ const getLectureAndSendNotitoMe = () => {
 const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
 
     const hour = moment.format('H');
+
     if (!(10 <= hour && hour <= 16)){
         return;
     }
@@ -386,36 +387,26 @@ const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
     cachedLectureCheck(majors.cache, lectures.cache, res => {
         res.map(i => {
             // console.log('found lecture: ', i);
+
+            const course_number = i.course_number;
             if (i.isEmpty) {
-                tokens.forEach(token => {
-                    users[token].course_numbers.map(k => {
-                        if (k === i.course_number) {
-                            users[token].lecture_infos.filter(lectureInfo => lectureInfo.course_number === k)[0].people = i.people;
-
-                            if (!users[token].sentLecture[k]) {
-                                console.log(i.subject, i.people);
-                                users[token].sentLecture[k] = true;
-                                sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 빈 자리 생겼어요` );
-                            }    
-                        }
-                    });
-                });
-            } else {
-                tokens.forEach(token => {
-                    users[token].course_numbers.map(k => {
-                        if (k === i.course_number) {
-                            users[token].lecture_infos.filter(lectureInfo => lectureInfo.course_number === k)[0].people = i.people;
-                        
-                            if (users[token].sentLecture[k]) {
-                                console.log(i.subject, i.people);
-                                users[token].sentLecture[k] = false;                          
-                                sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 자리 다 찼네요` );
-                            }
+                lectures.tokens[course_number].map(token => {
+                    if (!users[token].sentLecture[course_number]) {
+                        users[token].lecture_infos.filter(lectureInfo => lectureInfo.course_number === course_number )[0].people = i.people;
+                        console.log(i.subject, i.people, moment.format('H:MM:SS'));
+                        users[token].sentLecture[course_number] = true;
+                        sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 빈 자리 생겼어요` );                            
                     }
-                    
-                    });
+                })
+            } else {
+                lectures.tokens[course_number].map(token => {
+                    users[token].lecture_infos.filter(lectureInfo => lectureInfo.course_number === course_number )[0].people = i.people;
+                    if (users[token].sentLecture[course_number]) {
+                        console.log(i.subject, i.people, moment.format('H:M'));
+                        users[token].sentLecture[course_number] = false;
+                        sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 자리 다 찼네요` );                           
+                    }
                 });
-
             }});
     }); 
 }

@@ -3,19 +3,20 @@ class Users {
         this.users = {};
         this.tokens = [];
         this.majors = {cache: [], count: {}};
-        this.lectures = {cache: [], count: {}};
+        this.lectures = {cache: [], tokens: {} };
     }
 
     addUser(user) {
 
-        let u = this.users[user.token];
+        const token = user.token;
+        let u = this.users[token];
         const course_number = user.course_number;
 
         if (!this.lectures.cache.includes(course_number)) {
             this.lectures.cache.push(course_number);
-            this.lectures.count[course_number] = 1;
+            this.lectures.tokens[course_number] = [token];
         } else {
-            this.lectures.count[course_number] += 1;
+            this.lectures.tokens[course_number].push(token);
         }
 
         if (!this.majors.cache.includes(user.major)) {
@@ -64,8 +65,8 @@ class Users {
         if (target) {
 
             // 강의 캐시 지우기
-            this.lectures.count[course_number] -= 1;
-            if (this.lectures.count[course_number] === 0) {
+            this.lectures.tokens[course_number].pop(token);
+            if (this.lectures.tokens[course_number].length === 0) {
                 this.lectures.cache = this.lectures.cache.filter(j => j !== course_number);
             }
 

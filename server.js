@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const moment = require('moment')();
 const {lectureCheck, getCachedLectureAndSendNoti} = require('./lecture-apply');
 const {Users} = require('./users');
 const path = require('path');
@@ -59,6 +60,10 @@ app.get('/usersStatus', (req, res) => {
     } else {
         res.send('Not permitted!');
     }
+})
+
+app.get('/time', (req, res) => {
+    res.send(moment.format('H:MM:SS'));
 })
 
 app.listen(port, () => {
