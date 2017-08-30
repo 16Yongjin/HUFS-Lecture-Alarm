@@ -137,21 +137,29 @@ const lectureCheck = (majors, callback) => {
             let lecture = [];
 
             fetchHtml.forEach(i => {
+                
                 let s = i.split('\n');
                 s = s.filter(i => i !== '');
-                //console.log(s);
+                // console.log(s);
                 let obj = {};
                 obj.num = s[0];
                 obj.area = s[1];
                 obj.year = s[2];
                 obj.course_number = s[3];
                 obj.subject = s[4];
+
+                if (obj.subject.startsWith('(')) {
+                    obj.year = 0
+                    obj.course_number = s[2];
+                    obj.subject = s[3];
+                }
+
                 obj.professor = s[6];
                 if (s[6][0] === '(' || s[6].length <= 1) {
                     obj.professor = s[5];
                 }
 
-                obj.note = s[s.length - 1].includes('/') ? '' : s[s.length - 1]; // 비고사항
+                obj.note = s[s.length - 1].includes(' / ') ? '' : s[s.length - 1]; // 비고사항
 
                 const timeIndex = obj.note === '' ? 2 : 3
 
@@ -159,6 +167,7 @@ const lectureCheck = (majors, callback) => {
                 if (obj.time.includes(')')) {
                     obj.time =  obj.time.slice(0, obj.time.indexOf(')') + 1);
                 }
+
                 obj.people = s.filter(k => k.includes(' / '))[0]
 
                 if (obj.people) {
@@ -225,9 +234,9 @@ const cachedLectureCheck = (majors, course_numbers, callback) => {
 
                 let s = i.split('\n');
                 s = s.filter(i => i !== '');
-                if (!course_numbers.includes(s[3])) {
-                    return;
-                }
+                if (course_numbers.includes(s[3]) || course_numbers.includes(s[2]) ) {
+
+                
                 //console.log(s);
                 let obj = {};
                 obj.num = s[0];
@@ -236,15 +245,23 @@ const cachedLectureCheck = (majors, course_numbers, callback) => {
                 obj.course_number = s[3];
                 obj.subject = s[4];
                 obj.professor = s[6];
+
+                if (obj.subject.startsWith('(')) {
+                    obj.year = 0
+                    obj.course_number = s[2];
+                    obj.subject = s[3];
+                }
+
                 if (s[6][0] === '(' || s[6].length <= 1) {
                     obj.professor = s[5];
                 }
 
-                obj.note = s[s.length - 1].includes('/') ? '' : s[s.length - 1]; // 비고사항
+                obj.note = s[s.length - 1].includes(' / ') ? '' : s[s.length - 1]; // 비고사항
 
                 const timeIndex = obj.note === '' ? 2 : 3
 
                 obj.time = s[s.length - timeIndex];
+                
                 if (obj.time.includes(')')) {
                     obj.time =  obj.time.slice(0, obj.time.indexOf(')') + 1);
                 }
@@ -263,6 +280,7 @@ const cachedLectureCheck = (majors, course_numbers, callback) => {
                 
                 lecture.push(obj);
                 obj = {};
+                }
             });
 
             lectureInfos = lectureInfos.concat(lecture);
@@ -379,9 +397,9 @@ const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
 
     const hour = moment.format('H');
 
-    if (!(10 <= hour && hour <= 16)){
-        return;
-    }
+    // if (!(10 <= hour && hour <= 16)){
+    //     return;
+    // }
     
     // console.log('majors :', majors, 'lectures:', lectures, 'tokens:', tokens, 'users:', users);
     cachedLectureCheck(majors.cache, lectures.cache, res => {
@@ -391,8 +409,8 @@ const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
             const course_number = i.course_number;
             if (i.isEmpty) {
                 lectures.tokens[course_number].map(token => {
+                    users[token].lecture_infos.find(lectureInfo => lectureInfo.course_number === course_number ).people = i.people; 
                     if (!users[token].sentLecture[course_number]) {
-                        users[token].lecture_infos.filter(lectureInfo => lectureInfo.course_number === course_number )[0].people = i.people;
                         console.log(i.subject, i.people, moment.format('H:MM:SS'));
                         users[token].sentLecture[course_number] = true;
                         sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 빈 자리 생겼어요` );                            
@@ -400,7 +418,7 @@ const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
                 })
             } else {
                 lectures.tokens[course_number].map(token => {
-                    users[token].lecture_infos.filter(lectureInfo => lectureInfo.course_number === course_number )[0].people = i.people;
+                    users[token].lecture_infos.find(lectureInfo => lectureInfo.course_number === course_number ).people = i.people;
                     if (users[token].sentLecture[course_number]) {
                         console.log(i.subject, i.people, moment.format('H:M'));
                         users[token].sentLecture[course_number] = false;
