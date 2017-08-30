@@ -430,7 +430,7 @@ const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
 }
 
 
-module.exports = {lectureCheck, getCachedLectureAndSendNoti}
+module.exports = {lectureCheck, getCachedLectureAndSendNoti, sendMessage}
 
 
 // lectureCheck(myLecture, i => {

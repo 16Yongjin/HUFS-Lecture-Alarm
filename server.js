@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const moment = require('moment')();
-const {lectureCheck, getCachedLectureAndSendNoti} = require('./lecture-apply');
+const {lectureCheck, getCachedLectureAndSendNoti,sendMessage} = require('./lecture-apply');
 const {Users} = require('./users');
 const path = require('path');
 
@@ -64,6 +64,20 @@ app.get('/usersStatus', (req, res) => {
 
 app.get('/time', (req, res) => {
     res.send(moment.format('H:MM:SS'));
+})
+
+app.get('/msg', (req, res) => {
+    if (!!req.query.title && !! req.query.text) {
+        users.tokens.map(token => {
+            sendMessage(token, req.query.title, req.query.text);
+        })
+
+        res.send(`Sent messages to ${users.tokens.lengt} people`);
+        
+    } else {
+        res.send('잘 좀 입력해라');
+        
+    }
 })
 
 app.listen(port, () => {
