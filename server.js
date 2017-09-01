@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const moment = require('moment')();
+const moment = require('moment');
 const {lectureCheck, getCachedLectureAndSendNoti,sendMessage} = require('./lecture-apply');
 const {Users} = require('./users');
 const path = require('path');
@@ -63,7 +63,7 @@ app.get('/usersStatus', (req, res) => {
 })
 
 app.get('/time', (req, res) => {
-    res.send(moment.format('H:MM:SS'));
+    res.send(moment().format('hh:mm:ss'));
 })
 
 app.get('/msg', (req, res) => {

@@ -1,6 +1,6 @@
 const request = require('request');
 const client = require('cheerio-httpcli');
-const moment = require('moment')();
+const moment = require('moment');
 
 const mm = [
     'AAR01_H1',
@@ -395,7 +395,7 @@ const getLectureAndSendNotitoMe = () => {
 
 const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
 
-    const hour = moment.format('H');
+    const hour = moment().format('h');
 
     // if (!(10 <= hour && hour <= 16)){
     //     return;
@@ -407,25 +407,29 @@ const getCachedLectureAndSendNoti = (majors, lectures, tokens, users) => {
             // console.log('found lecture: ', i);
 
             const course_number = i.course_number;
-            if (i.isEmpty) {
+
                 lectures.tokens[course_number].map(token => {
-                    users[token].lecture_infos.find(lectureInfo => lectureInfo.course_number === course_number ).people = i.people; 
-                    if (!users[token].sentLecture[course_number]) {
-                        console.log(i.subject, i.people, moment.format('H:MM:SS'));
+                    let l = users[token].lecture_infos.find(lectureInfo => lectureInfo.course_number === course_number );
+
+                    if (!l) {
+                        return;
+                    }
+                    l.people = i.people;                        
+
+                    if (i.isEmpty &&  !users[token].sentLecture[course_number]) {
+                        console.log(i.subject, i.people, moment().format('hh:mm:ss'));
                         users[token].sentLecture[course_number] = true;
                         sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 빈 자리 생겼어요` );                            
                     }
-                })
-            } else {
-                lectures.tokens[course_number].map(token => {
-                    users[token].lecture_infos.find(lectureInfo => lectureInfo.course_number === course_number ).people = i.people;
-                    if (users[token].sentLecture[course_number]) {
-                        console.log(i.subject, i.people, moment.format('H:M'));
+
+                    if (!i.isEmpty && users[token].sentLecture[course_number]) {
+                        console.log(i.subject, i.people, moment().format('hh:mm:ss'));
                         users[token].sentLecture[course_number] = false;
-                        sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 자리 다 찼네요` );                           
+                        sendMessage(token, `${i.subject}`, `${i.professor} 교수님, 자리 다 찼네요` );   
                     }
-                });
-            }});
+                })
+
+            });
     }); 
 }
 
@@ -451,3 +455,6 @@ module.exports = {lectureCheck, getCachedLectureAndSendNoti, sendMessage}
 //             return 
 //     }, 10000)
 // }
+
+
+

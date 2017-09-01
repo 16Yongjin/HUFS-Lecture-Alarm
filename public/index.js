@@ -9,6 +9,12 @@ var config = {
 firebase.initializeApp(config);
 
 
+var chrome = (/chrome/i.test(navigator.userAgent.toLowerCase()));
+
+var ios = (/iphone|ipad|ipod/i.test(navigator.userAgent.toLowerCase()));
+
+if (!ios) {
+
 var messaging = firebase.messaging();
 messaging.requestPermission()
 .then(function() {
@@ -21,7 +27,11 @@ messaging.requestPermission()
 
 })
 .catch(function(err) {
-    alert('음..🤔 이 브라우저는 지원이 안되는 것 같네요..\n다른 브라우저로 접속해주세요.');
+    if (!chrome) {
+        alert( '이 브라우저는 지원이 안됩니다. 크롬 브라우저로 접속해주세요!')
+    } else {
+        alert('토큰 등록 오류. 강의 알람 등록이 불가능합니다.')
+    }
     console.log('Error Occured.', err);
 });
 
@@ -32,6 +42,10 @@ messaging.onMessage(function(payload) {
     alert(payload.notification.title + ' ' + payload.notification.body);
 });
 
+} else {
+alert('iOS는 지원하지 않습니다.😢' );
+}
+ 
 var serverURL = 'http://localhost:3005';
 
 
@@ -67,8 +81,13 @@ var app = new Vue({
             }
 
             if (!this.token.length) {
-                return alert('음.. 등록에 실패했습니다. 다른 브라우저로 접속해주세요.');
-            }
+                 if (!chrome) {
+                    alert('등록에 실패했습니다. 크롬 브라우저로 접속해주세요!')
+                } else {
+                    alert('등록에 실패했습니다.');  
+                }
+		return;	
+	    }
 
             if (this.registeredLectures.length > 4) {
                 return alert('알람은 5개까지 등록 가능합니다.');
